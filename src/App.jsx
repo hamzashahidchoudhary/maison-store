@@ -1,3 +1,4 @@
+import AdminPage from '@/pages/AdminPage'
 import { Routes, Route } from 'react-router-dom'
 import { AuthProvider } from '@/context/AuthContext'
 import { CartProvider } from '@/context/CartContext'
@@ -20,6 +21,7 @@ export default function App() {
         <CartDrawer />
         <main>
           <Routes>
+            <Route path="/admin" element={<AdminPage />} />
             <Route path="/" element={<HomePage />} />
             <Route path="/shop" element={<ShopPage />} />
             <Route path="/collections" element={<CollectionsPage />} />
