@@ -17,7 +17,7 @@ export default function ShopPage() {
   const [category, setCategory] = useState('all')
   const [sort, setSort] = useState('default')
   const [search, setSearch] = useState('')
-  const [maxPrice, setMaxPrice] = useState(200)
+  const [maxPrice, setMaxPrice] = useState(1000)
   const [addedIds, setAddedIds] = useState([])
   const { addItem } = useCart()
 
@@ -45,7 +45,7 @@ export default function ShopPage() {
 
   const allPrices = products.map(p => p.price)
   const minP = allPrices.length ? Math.min(...allPrices) : 0
-  const maxP = allPrices.length ? Math.max(...allPrices) : 200
+  const maxP = allPrices.length ? Math.max(...allPrices) : 1000
 
   return (
     <div className="page">
