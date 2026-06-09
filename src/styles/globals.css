@@ -112,3 +112,67 @@ img { max-width: 100%; display: block; }
 /* Page transitions */
 .page { animation: fadeIn 0.25s ease; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ── Mobile responsive fixes ── */
+@media (max-width: 639px) {
+
+  /* Shop page — stack sidebar above products */
+  .shop-layout {
+    grid-template-columns: 1fr !important;
+  }
+  .shop-sidebar {
+    position: static !important;
+  }
+
+  /* About stats — 2 cols on mobile */
+  .about-stats {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  /* About values — 1 col on mobile */
+  .about-values {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* About team — 1 col on mobile */
+  .about-team {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Collections hero — stack */
+  .collections-hero-inner {
+    grid-template-columns: 1fr !important;
+  }
+  .collections-hero-emoji {
+    display: none !important;
+  }
+
+  /* Checkout layout — stack */
+  .checkout-layout {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Hero — stack */
+  .hero-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .hero-visual {
+    display: none !important;
+  }
+
+  /* Admin table — hide on mobile, show cards instead */
+  .admin-table-header {
+    display: none !important;
+  }
+
+  /* General padding reduction */
+  .container {
+    padding: 0 1rem !important;
+  }
+}
+
+@media (min-width: 640px) {
+  .nav-cart-text {
+    display: inline !important;
+  }
+}
