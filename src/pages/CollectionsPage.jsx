@@ -64,6 +64,14 @@ export default function CollectionsPage() {
 
   return (
     <div className="page">
+      <style>{`
+        @media (max-width: 639px) {
+          .col-hero-emoji { display: none !important; }
+          .col-products-inner { padding: 1.5rem 1rem !important; }
+          .col-grid { grid-template-columns: 1fr !important; }
+          .col-other-grid { grid-template-columns: 1fr !important; }
+        }
+      `}</style>
 
       {/* Big hero with tabs */}
       <div style={{ ...styles.hero, background: active.bg }}>
@@ -94,7 +102,7 @@ export default function CollectionsPage() {
               </div>
             </div>
           </div>
-          <div style={styles.heroRight}>
+          <div className="col-hero-emoji" style={styles.heroRight}>
             <div style={styles.heroEmoji}>{active.emoji}</div>
           </div>
         </div>
@@ -198,7 +206,7 @@ export default function CollectionsPage() {
 
 const styles = {
   hero: { padding: '0', transition: 'background 0.4s ease' },
-  heroInner: { maxWidth: '1100px', margin: '0 auto', padding: '4rem 2rem 2rem', display: 'grid', gridTemplateColumns: '1fr auto', gap: '2rem', alignItems: 'center' },
+  heroInner: { maxWidth: '1100px', margin: '0 auto', padding: '3rem 1.2rem 2rem', display: 'grid', gridTemplateColumns: '1fr auto', gap: '2rem', alignItems: 'center' },
   heroLeft: {},
   heroTag: { display: 'inline-block', background: 'rgba(255,255,255,0.2)', color: 'white', fontSize: '11px', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', padding: '4px 12px', borderRadius: '20px', marginBottom: '1rem' },
   heroTitle: { fontFamily: 'var(--serif)', fontSize: 'clamp(2.5rem,5vw,4rem)', fontWeight: 700, color: 'white', marginBottom: '0.5rem', lineHeight: 1.1 },
@@ -210,7 +218,7 @@ const styles = {
   heroStatLabel: { fontSize: '11px', color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase', letterSpacing: '0.06em' },
   heroRight: { display: 'flex', alignItems: 'center', justifyContent: 'center' },
   heroEmoji: { fontSize: '8rem', filter: 'drop-shadow(0 8px 24px rgba(0,0,0,0.2))', transition: 'all 0.3s ease' },
-  tabs: { display: 'flex', maxWidth: '1100px', margin: '0 auto', padding: '0 2rem' },
+  tabs: { display: 'flex', maxWidth: '1100px', margin: '0 auto', padding: '0 1rem', overflowX: 'auto' },
   tab: { display: 'flex', alignItems: 'center', gap: '4px', padding: '1rem 1.5rem', color: 'rgba(255,255,255,0.8)', border: 'none', cursor: 'pointer', fontSize: '14px', fontWeight: 500, fontFamily: 'var(--sans)', transition: 'all 0.2s', borderRadius: '0' },
   tabCount: { background: 'rgba(255,255,255,0.2)', color: 'white', borderRadius: '20px', padding: '1px 8px', fontSize: '11px', marginLeft: '4px' },
   productsSection: { transition: 'background 0.4s ease', minHeight: '60vh' },
