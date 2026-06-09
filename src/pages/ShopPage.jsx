@@ -17,7 +17,7 @@ export default function ShopPage() {
   const [category, setCategory] = useState('all')
   const [sort, setSort] = useState('default')
   const [search, setSearch] = useState('')
-  const [maxPrice, setMaxPrice] = useState(1000)
+  const [maxPrice, setMaxPrice] = useState(200)
   const [addedIds, setAddedIds] = useState([])
   const { addItem } = useCart()
 
@@ -45,7 +45,7 @@ export default function ShopPage() {
 
   const allPrices = products.map(p => p.price)
   const minP = allPrices.length ? Math.min(...allPrices) : 0
-  const maxP = allPrices.length ? Math.max(...allPrices) : 1000
+  const maxP = allPrices.length ? Math.max(...allPrices) : 200
 
   return (
     <div className="page">
@@ -59,9 +59,18 @@ export default function ShopPage() {
         </div>
       </div>
 
-      <div style={styles.layout}>
+      <style>{`
+        .shop-layout { display: grid; grid-template-columns: 220px 1fr; gap: 3rem; align-items: start; max-width: 1100px; margin: 0 auto; padding: 2.5rem 2rem; }
+        .shop-sidebar { position: sticky; top: 90px; }
+        @media (max-width: 639px) {
+          .shop-layout { grid-template-columns: 1fr !important; gap: 1.5rem !important; padding: 1.5rem 1rem !important; }
+          .shop-sidebar { position: static !important; }
+        }
+      `}</style>
+
+      <div className="shop-layout">
         {/* Sidebar */}
-        <aside style={styles.sidebar}>
+        <aside className="shop-sidebar">
           <div style={styles.sideSection}>
             <div style={styles.sideTitle}>Search</div>
             <input className="input" placeholder="Search products..." value={search} onChange={e => setSearch(e.target.value)} />
@@ -107,8 +116,8 @@ export default function ShopPage() {
               style={styles.slider}
             />
             <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '6px' }}>
-              <span style={{ fontSize: '11px', color: 'var(--muted)' }}>$0</span>
-              <span style={{ fontSize: '11px', color: 'var(--muted)' }}>$1000</span>
+              <span style={{ fontSize: '11px', color: 'var(--muted)' }}>${minP}</span>
+              <span style={{ fontSize: '11px', color: 'var(--muted)' }}>${maxP}</span>
             </div>
             {maxPrice < maxP && (
               <button onClick={() => setMaxPrice(maxP)} style={styles.resetBtn}>Reset</button>
@@ -117,7 +126,7 @@ export default function ShopPage() {
         </aside>
 
         {/* Products */}
-        <main>
+        <main style={{ minWidth: 0 }}>
           <div style={styles.toolbar}>
             <span style={styles.resultCount}>{loading ? 'Loading...' : `${filtered.length} products`}</span>
             {(search || maxPrice < maxP) && (
@@ -183,7 +192,7 @@ export default function ShopPage() {
 
 const styles = {
   header: { background: 'var(--dark)', color: 'var(--cream)', padding: '4rem 2rem' },
-  headerInner: { maxWidth: '1100px', margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem', alignItems: 'center' },
+  headerInner: { maxWidth: '1100px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '1rem' },
   headerLabel: { fontSize: '11px', fontWeight: 500, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--accent)', marginBottom: '0.5rem' },
   headerTitle: { fontFamily: 'var(--serif)', fontSize: '3rem', fontWeight: 700 },
   headerDesc: { color: 'rgba(247,244,239,0.6)', fontSize: '15px', lineHeight: 1.7 },
