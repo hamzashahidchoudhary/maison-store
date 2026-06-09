@@ -107,8 +107,8 @@ export default function ShopPage() {
               style={styles.slider}
             />
             <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '6px' }}>
-              <span style={{ fontSize: '11px', color: 'var(--muted)' }}>${minP}</span>
-              <span style={{ fontSize: '11px', color: 'var(--muted)' }}>${maxP}</span>
+              <span style={{ fontSize: '11px', color: 'var(--muted)' }}>$0</span>
+              <span style={{ fontSize: '11px', color: 'var(--muted)' }}>$1000</span>
             </div>
             {maxPrice < maxP && (
               <button onClick={() => setMaxPrice(maxP)} style={styles.resetBtn}>Reset</button>
