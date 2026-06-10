@@ -152,7 +152,10 @@ export default function ShopPage() {
                   <div key={product.id} style={styles.card}>
                     <Link to={`/product/${product.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
                       <div style={{ ...styles.cardImg, background: product.bg }}>
-                        <span style={{ fontSize: '3rem' }}>{product.emoji}</span>
+                        {product.image
+                          ? <img src={product.image} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                          : <span style={{ fontSize: '3rem' }}>{product.emoji}</span>
+                        }
                         {product.badge && <span className={`badge badge-${product.badge}`} style={styles.badge}>{product.badge}</span>}
                       </div>
                       <div style={styles.cardBody}>
