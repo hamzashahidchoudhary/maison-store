@@ -194,7 +194,14 @@ export default function ShopPage() {
 }
 
 const styles = {
-  header: { background: 'var(--dark)', color: 'var(--cream)', padding: '4rem 2rem' },
+  header: { 
+    background: 'var(--dark)', 
+    color: 'var(--cream)', 
+    padding: '4rem 2rem',
+    backgroundImage: 'linear-gradient(rgba(26,24,20,0.82), rgba(26,24,20,0.82)), url(https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=1200&q=80)',
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
+  },
   headerInner: { maxWidth: '1100px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '1rem' },
   headerLabel: { fontSize: '11px', fontWeight: 500, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--accent)', marginBottom: '0.5rem' },
   headerTitle: { fontFamily: 'var(--serif)', fontSize: '3rem', fontWeight: 700 },

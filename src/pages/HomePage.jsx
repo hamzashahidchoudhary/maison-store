@@ -65,15 +65,15 @@ export default function HomePage() {
             </div>
           </div>
           <div className="hero-visual-grid">
-            <div style={{ ...styles.swatch, background: 'linear-gradient(160deg,#8B7355,#5C4A32)', gridRow: 'span 2' }}>
+            <div style={{ ...styles.swatch, backgroundImage: 'linear-gradient(160deg, rgba(139,115,85,0.7), rgba(92,74,50,0.85)), url(https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=400&q=80)', backgroundSize: 'cover', backgroundPosition: 'center', gridRow: 'span 2' }}>
               <span style={styles.swatchLabel}>Bestseller</span>
               <span style={styles.swatchTitle}>Walnut Collection</span>
             </div>
-            <div style={{ ...styles.swatch, background: 'linear-gradient(160deg,#C8A96E,#9A7A45)', height: '110px' }}>
+            <div style={{ ...styles.swatch, backgroundImage: 'linear-gradient(160deg, rgba(200,169,110,0.7), rgba(154,122,69,0.85)), url(https://images.unsplash.com/photo-1612196808214-b7e239e5f95a?w=400&q=80)', backgroundSize: 'cover', backgroundPosition: 'center', height: '110px' }}>
               <span style={styles.swatchLabel}>New In</span>
               <span style={styles.swatchTitle}>Amber Ceramics</span>
             </div>
-            <div style={{ ...styles.swatch, background: 'linear-gradient(160deg,#D4C5B0,#A89880)', height: '110px' }}>
+            <div style={{ ...styles.swatch, backgroundImage: 'linear-gradient(160deg, rgba(212,197,176,0.7), rgba(168,152,128,0.85)), url(https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&q=80)', backgroundSize: 'cover', backgroundPosition: 'center', height: '110px' }}>
               <span style={styles.swatchLabel}>Limited</span>
               <span style={styles.swatchTitle}>Linen Series</span>
             </div>

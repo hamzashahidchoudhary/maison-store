@@ -8,7 +8,8 @@ const collectionInfo = {
     title: 'Ceramics',
     subtitle: 'Handcrafted with intention',
     desc: 'Each piece is thrown or hand-built by skilled artisans, fired to perfection, and finished with our signature earth-toned glazes.',
-    bg: 'linear-gradient(135deg, #8B7355 0%, #5C4A32 100%)',
+    bg: 'linear-gradient(135deg, rgba(139,115,85,0.88) 0%, rgba(92,74,50,0.92) 100%)',
+    bgImage: 'https://images.unsplash.com/photo-1612196808214-b7e239e5f95a?w=1200&q=80',
     lightBg: '#F5EEE6',
     emoji: '🏺',
     tag: 'Artisan Made',
@@ -17,7 +18,8 @@ const collectionInfo = {
     title: 'Textiles',
     subtitle: 'Woven with care',
     desc: 'From linen throws to merino cushions, our textile collection brings warmth and texture to every room in your home.',
-    bg: 'linear-gradient(135deg, #C8A96E 0%, #9A7A45 100%)',
+    bg: 'linear-gradient(135deg, rgba(200,169,110,0.88) 0%, rgba(154,122,69,0.92) 100%)',
+    bgImage: 'https://images.unsplash.com/photo-1584346133934-a3afd2a2b8e2?w=1200&q=80',
     lightBg: '#FBF5EA',
     emoji: '🧶',
     tag: 'Natural Fibres',
@@ -26,7 +28,8 @@ const collectionInfo = {
     title: 'Decor',
     subtitle: 'Details that matter',
     desc: 'Thoughtfully designed objects that bring beauty and function together. Each piece is chosen to complement your living space.',
-    bg: 'linear-gradient(135deg, #B0A090 0%, #7A6A5A 100%)',
+    bg: 'linear-gradient(135deg, rgba(176,160,144,0.88) 0%, rgba(122,106,90,0.92) 100%)',
+    bgImage: 'https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=1200&q=80',
     lightBg: '#F5F0EA',
     emoji: '✨',
     tag: 'Limited Edition',
@@ -74,7 +77,13 @@ export default function CollectionsPage() {
       `}</style>
 
       {/* Big hero with tabs */}
-      <div style={{ ...styles.hero, background: active.bg }}>
+      <div style={{ 
+        ...styles.hero, 
+        backgroundImage: `${active.bg}, url(${active.bgImage})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        transition: 'background-image 0.4s ease',
+      }}>
         <div style={styles.heroInner}>
           <div style={styles.heroLeft}>
             <span style={styles.heroTag}>{active.tag}</span>
