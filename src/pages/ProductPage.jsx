@@ -32,7 +32,10 @@ export default function ProductPage() {
       <div style={styles.layout}>
         {/* Image */}
         <div style={{ ...styles.imgBox, background: product.bg }}>
-          <span style={{ fontSize: '7rem' }}>{product.emoji}</span>
+          {product.image
+            ? <img src={product.image} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '20px' }} />
+            : <span style={{ fontSize: '7rem' }}>{product.emoji}</span>
+          }
           {product.badge && (
             <span className={`badge badge-${product.badge}`} style={{ position: 'absolute', top: '20px', left: '20px' }}>
               {product.badge}

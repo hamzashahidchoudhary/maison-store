@@ -1,13 +1,14 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useAuth } from '@/context/AuthContext'
 import { productsAPI } from '@/lib/api'
+import { uploadImage } from '@/lib/cloudinary'
 import { Link } from 'react-router-dom'
 
 const emptyForm = {
   name: '', description: '', price: '', oldPrice: '',
   category: 'ceramics', emoji: '🏺', bg: '#F0EAE0',
   badge: '', stock: 100, rating: 4.5, reviews: 0,
-  details: '',
+  details: '', image: '',
 }
 
 const categories = ['ceramics', 'textiles', 'decor']
@@ -22,12 +23,12 @@ export default function AdminPage() {
   const [editingId, setEditingId] = useState(null)
   const [form, setForm] = useState(emptyForm)
   const [saving, setSaving] = useState(false)
+  const [uploading, setUploading] = useState(false)
   const [deletingId, setDeletingId] = useState(null)
   const [successMsg, setSuccessMsg] = useState('')
+  const fileInputRef = useRef(null)
 
-  useEffect(() => {
-    loadProducts()
-  }, [])
+  useEffect(() => { loadProducts() }, [])
 
   const loadProducts = () => {
     productsAPI.getAll('all')
@@ -38,12 +39,27 @@ export default function AdminPage() {
 
   const update = (field) => (e) => setForm(f => ({ ...f, [field]: e.target.value }))
 
+  const handleImageUpload = async (e) => {
+    const file = e.target.files[0]
+    if (!file) return
+    setUploading(true)
+    try {
+      const url = await uploadImage(file)
+      setForm(f => ({ ...f, image: url }))
+    } catch (err) {
+      alert('Image upload failed. Please try again.')
+    } finally {
+      setUploading(false)
+    }
+  }
+
   const handleEdit = (product) => {
     setForm({
       ...product,
       details: Array.isArray(product.details) ? product.details.join('\n') : product.details,
       oldPrice: product.oldPrice || '',
       badge: product.badge || '',
+      image: product.image || '',
     })
     setEditingId(product.id)
     setShowForm(true)
@@ -64,6 +80,10 @@ export default function AdminPage() {
   }
 
   const handleSave = async () => {
+    if (!form.name || !form.price) {
+      alert('Please fill in at least the name and price.')
+      return
+    }
     setSaving(true)
     try {
       const payload = {
@@ -74,31 +94,19 @@ export default function AdminPage() {
         rating: Number(form.rating),
         reviews: Number(form.reviews),
         badge: form.badge || null,
+        image: form.image || null,
         details: form.details.split('\n').filter(d => d.trim()),
       }
-
-      if (editingId) {
-        await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:4000/api'}/products/${editingId}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${localStorage.getItem('maison_token')}`,
-          },
-          body: JSON.stringify(payload),
-        })
-        setSuccessMsg('Product updated successfully!')
-      } else {
-        await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:4000/api'}/products`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${localStorage.getItem('maison_token')}`,
-          },
-          body: JSON.stringify(payload),
-        })
-        setSuccessMsg('Product created successfully!')
-      }
-
+      const base = import.meta.env.VITE_API_URL || 'http://localhost:4000/api'
+      const token = localStorage.getItem('maison_token')
+      const url = editingId ? `${base}/products/${editingId}` : `${base}/products`
+      const method = editingId ? 'PUT' : 'POST'
+      await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify(payload),
+      })
+      setSuccessMsg(editingId ? 'Product updated!' : 'Product created!')
       loadProducts()
       handleCancel()
       setTimeout(() => setSuccessMsg(''), 3000)
@@ -110,24 +118,23 @@ export default function AdminPage() {
   }
 
   const handleDelete = async (id) => {
-    if (!confirm('Are you sure you want to delete this product?')) return
+    if (!confirm('Delete this product?')) return
     setDeletingId(id)
     try {
-      await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:4000/api'}/products/${id}`, {
+      const base = import.meta.env.VITE_API_URL || 'http://localhost:4000/api'
+      const token = localStorage.getItem('maison_token')
+      await fetch(`${base}/products/${id}`, {
         method: 'DELETE',
-        headers: { Authorization: `Bearer ${localStorage.getItem('maison_token')}` },
+        headers: { Authorization: `Bearer ${token}` },
       })
       setProducts(prev => prev.filter(p => p.id !== id))
       setSuccessMsg('Product deleted.')
       setTimeout(() => setSuccessMsg(''), 3000)
-    } catch (err) {
-      console.error(err)
     } finally {
       setDeletingId(null)
     }
   }
 
-  // Not logged in
   if (!user) return (
     <div style={{ textAlign: 'center', padding: '6rem 2rem' }}>
       <h2 style={{ fontFamily: 'var(--serif)', marginBottom: '1rem' }}>Please sign in</h2>
@@ -135,20 +142,16 @@ export default function AdminPage() {
     </div>
   )
 
-  // Not admin
   if (user.role !== 'ADMIN') return (
     <div style={{ textAlign: 'center', padding: '6rem 2rem' }}>
       <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🔒</div>
       <h2 style={{ fontFamily: 'var(--serif)', marginBottom: '0.5rem' }}>Admin Access Required</h2>
-      <p style={{ color: 'var(--muted)', marginBottom: '1.5rem' }}>You need an admin account to access this page.</p>
       <Link to="/" className="btn btn-dark">Go Home</Link>
     </div>
   )
 
   return (
     <div className="page" style={{ maxWidth: '1100px', margin: '0 auto', padding: '2.5rem 2rem' }}>
-
-      {/* Header */}
       <div style={styles.pageHeader}>
         <div>
           <h1 style={styles.pageTitle}>Admin Panel</h1>
@@ -157,7 +160,6 @@ export default function AdminPage() {
         <button style={styles.newBtn} onClick={handleNew}>+ Add New Product</button>
       </div>
 
-      {/* Success message */}
       {successMsg && <div style={styles.successBanner}>{successMsg}</div>}
 
       {/* Product Form */}
@@ -200,8 +202,53 @@ export default function AdminPage() {
               </select>
             </div>
 
+            {/* Image Upload */}
+            <div className="form-group" style={{ gridColumn: '1/-1' }}>
+              <label className="label">Product Image</label>
+              <div style={styles.imageUploadArea}>
+                {form.image ? (
+                  <div style={styles.imagePreviewWrap}>
+                    <img src={form.image} alt="Product" style={styles.imagePreview} />
+                    <button style={styles.removeImageBtn} onClick={() => setForm(f => ({ ...f, image: '' }))}>
+                      ✕ Remove
+                    </button>
+                  </div>
+                ) : (
+                  <div style={styles.uploadPlaceholder} onClick={() => fileInputRef.current?.click()}>
+                    {uploading ? (
+                      <div>
+                        <div style={styles.uploadSpinner}>⏳</div>
+                        <p style={styles.uploadText}>Uploading to Cloudinary...</p>
+                      </div>
+                    ) : (
+                      <div>
+                        <div style={{ fontSize: '2rem', marginBottom: '8px' }}>📸</div>
+                        <p style={styles.uploadText}>Click to upload image</p>
+                        <p style={styles.uploadSubtext}>JPG, PNG, WebP — max 10MB</p>
+                      </div>
+                    )}
+                  </div>
+                )}
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  style={{ display: 'none' }}
+                />
+                {!form.image && !uploading && (
+                  <button style={styles.uploadBtn} onClick={() => fileInputRef.current?.click()}>
+                    Choose Image
+                  </button>
+                )}
+              </div>
+              <p style={{ fontSize: '11px', color: 'var(--muted)', marginTop: '6px' }}>
+                Image will be stored on Cloudinary CDN for fast delivery worldwide.
+              </p>
+            </div>
+
             <div className="form-group">
-              <label className="label">Emoji</label>
+              <label className="label">Emoji (fallback)</label>
               <input className="input" value={form.emoji} onChange={update('emoji')} placeholder="🏺" />
             </div>
 
@@ -214,14 +261,8 @@ export default function AdminPage() {
               <label className="label">Background Color</label>
               <div style={styles.colorPicker}>
                 {bgColors.map(color => (
-                  <button
-                    key={color}
-                    onClick={() => setForm(f => ({ ...f, bg: color }))}
-                    style={{
-                      ...styles.colorSwatch,
-                      background: color,
-                      border: form.bg === color ? '3px solid var(--dark)' : '2px solid transparent',
-                    }}
+                  <button key={color} onClick={() => setForm(f => ({ ...f, bg: color }))}
+                    style={{ ...styles.colorSwatch, background: color, border: form.bg === color ? '3px solid var(--dark)' : '2px solid transparent' }}
                   />
                 ))}
               </div>
@@ -230,30 +271,23 @@ export default function AdminPage() {
             <div className="form-group">
               <label className="label">Preview</label>
               <div style={{ ...styles.preview, background: form.bg }}>
-                <span style={{ fontSize: '2.5rem' }}>{form.emoji}</span>
+                {form.image
+                  ? <img src={form.image} alt="" style={{ width: '60px', height: '60px', objectFit: 'cover', borderRadius: '8px' }} />
+                  : <span style={{ fontSize: '2.5rem' }}>{form.emoji}</span>
+                }
               </div>
             </div>
 
             <div className="form-group" style={{ gridColumn: '1/-1' }}>
               <label className="label">Product Details (one per line)</label>
-              <textarea
-                className="input"
-                value={form.details}
-                onChange={update('details')}
-                placeholder={"Set of 2 mugs\n350ml capacity\nDishwasher safe"}
-                rows={4}
-                style={{ resize: 'vertical' }}
-              />
+              <textarea className="input" value={form.details} onChange={update('details')}
+                placeholder={"Set of 2 mugs\n350ml capacity\nDishwasher safe"} rows={4} style={{ resize: 'vertical' }} />
             </div>
           </div>
 
           <div style={styles.formActions}>
             <button style={styles.cancelBtn} onClick={handleCancel}>Cancel</button>
-            <button
-              style={{ ...styles.saveBtn, opacity: saving ? 0.7 : 1 }}
-              onClick={handleSave}
-              disabled={saving}
-            >
+            <button style={{ ...styles.saveBtn, opacity: saving ? 0.7 : 1 }} onClick={handleSave} disabled={saving}>
               {saving ? 'Saving...' : editingId ? 'Update Product' : 'Create Product'}
             </button>
           </div>
@@ -276,7 +310,12 @@ export default function AdminPage() {
           {products.map(product => (
             <div key={product.id} style={styles.tableRow}>
               <div style={styles.productCell}>
-                <div style={{ ...styles.productThumb, background: product.bg }}>{product.emoji}</div>
+                <div style={{ ...styles.productThumb, background: product.bg }}>
+                  {product.image
+                    ? <img src={product.image} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '10px' }} />
+                    : product.emoji
+                  }
+                </div>
                 <div>
                   <div style={styles.productName}>{product.name}</div>
                   {product.badge && <span className={`badge badge-${product.badge}`}>{product.badge}</span>}
@@ -291,11 +330,8 @@ export default function AdminPage() {
               <span style={styles.cell}>{product.rating}★ ({product.reviews})</span>
               <div style={styles.actions}>
                 <button style={styles.editBtn} onClick={() => handleEdit(product)}>Edit</button>
-                <button
-                  style={{ ...styles.deleteBtn, opacity: deletingId === product.id ? 0.5 : 1 }}
-                  onClick={() => handleDelete(product.id)}
-                  disabled={deletingId === product.id}
-                >
+                <button style={{ ...styles.deleteBtn, opacity: deletingId === product.id ? 0.5 : 1 }}
+                  onClick={() => handleDelete(product.id)} disabled={deletingId === product.id}>
                   {deletingId === product.id ? '...' : 'Delete'}
                 </button>
               </div>
@@ -315,17 +351,26 @@ const styles = {
   formCard: { background: 'white', border: '1px solid var(--border)', borderRadius: '20px', padding: '2rem', marginBottom: '2rem' },
   formTitle: { fontFamily: 'var(--serif)', fontSize: '1.3rem', fontWeight: 700, marginBottom: '1.5rem' },
   formGrid: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 1.5rem' },
+  imageUploadArea: { display: 'flex', flexDirection: 'column', gap: '10px' },
+  imagePreviewWrap: { position: 'relative', display: 'inline-block' },
+  imagePreview: { width: '200px', height: '200px', objectFit: 'cover', borderRadius: '12px', border: '1px solid var(--border)', display: 'block' },
+  removeImageBtn: { marginTop: '8px', background: '#FEF2F2', border: '1px solid #FECACA', color: '#DC2626', padding: '5px 14px', borderRadius: 'var(--radius-full)', fontSize: '12px', cursor: 'pointer', fontFamily: 'var(--sans)' },
+  uploadPlaceholder: { border: '2px dashed var(--border)', borderRadius: '12px', padding: '2rem', textAlign: 'center', cursor: 'pointer', background: 'var(--cream)', transition: 'border-color 0.2s' },
+  uploadSpinner: { fontSize: '2rem', marginBottom: '8px' },
+  uploadText: { fontSize: '14px', fontWeight: 500, color: 'var(--dark)', marginBottom: '4px' },
+  uploadSubtext: { fontSize: '12px', color: 'var(--muted)' },
+  uploadBtn: { background: 'var(--dark)', color: 'var(--cream)', border: 'none', padding: '9px 20px', borderRadius: 'var(--radius-full)', fontSize: '13px', fontWeight: 500, cursor: 'pointer', alignSelf: 'flex-start' },
   colorPicker: { display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: '4px' },
-  colorSwatch: { width: '32px', height: '32px', borderRadius: '8px', cursor: 'pointer', transition: 'transform 0.15s' },
+  colorSwatch: { width: '32px', height: '32px', borderRadius: '8px', cursor: 'pointer' },
   preview: { height: '80px', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center' },
   formActions: { display: 'flex', gap: '12px', justifyContent: 'flex-end', marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid var(--border)' },
   cancelBtn: { background: 'transparent', color: 'var(--dark)', border: '1px solid var(--border)', padding: '10px 22px', borderRadius: 'var(--radius-full)', fontSize: '14px', cursor: 'pointer' },
   saveBtn: { background: 'var(--dark)', color: 'var(--cream)', border: 'none', padding: '10px 22px', borderRadius: 'var(--radius-full)', fontSize: '14px', fontWeight: 500, cursor: 'pointer' },
   table: { background: 'white', border: '1px solid var(--border)', borderRadius: '16px', overflow: 'hidden' },
   tableHeader: { display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 0.5fr 1fr 1fr', gap: '1rem', padding: '1rem 1.5rem', background: 'var(--cream)', fontSize: '11px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--muted)', borderBottom: '1px solid var(--border)' },
-  tableRow: { display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 0.5fr 1fr 1fr', gap: '1rem', padding: '1rem 1.5rem', alignItems: 'center', borderBottom: '1px solid var(--border)', transition: 'background 0.15s' },
+  tableRow: { display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 0.5fr 1fr 1fr', gap: '1rem', padding: '1rem 1.5rem', alignItems: 'center', borderBottom: '1px solid var(--border)' },
   productCell: { display: 'flex', gap: '12px', alignItems: 'center' },
-  productThumb: { width: '44px', height: '44px', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.4rem', flexShrink: 0 },
+  productThumb: { width: '44px', height: '44px', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.4rem', flexShrink: 0, overflow: 'hidden' },
   productName: { fontSize: '13px', fontWeight: 500, marginBottom: '3px' },
   cell: { fontSize: '13px', color: 'var(--dark)' },
   actions: { display: 'flex', gap: '8px' },
