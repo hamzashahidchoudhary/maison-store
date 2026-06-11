@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useAuth } from '@/context/AuthContext'
 import { productsAPI } from '@/lib/api'
 import { uploadImage } from '@/lib/cloudinary'
+import { categories } from '@/lib/categories'
 import { Link } from 'react-router-dom'
 
 const emptyForm = {
@@ -11,7 +12,6 @@ const emptyForm = {
   details: '', image: '',
 }
 
-const categories = ['ceramics', 'textiles', 'decor']
 const badges = ['', 'new', 'sale']
 const bgColors = ['#F0EAE0', '#EDE8E0', '#E8E0D5', '#F5EED8', '#EDE5D8', '#EAE0D0', '#F2E8D0', '#E5DDD0']
 
@@ -191,7 +191,9 @@ export default function AdminPage() {
             <div className="form-group">
               <label className="label">Category</label>
               <select className="input" value={form.category} onChange={update('category')}>
-                {categories.map(c => <option key={c} value={c}>{c.charAt(0).toUpperCase() + c.slice(1)}</option>)}
+                {categories.map(c => (
+                  <option key={c.id} value={c.id}>{c.label}</option>
+                ))}
               </select>
             </div>
 
@@ -217,7 +219,7 @@ export default function AdminPage() {
                   <div style={styles.uploadPlaceholder} onClick={() => fileInputRef.current?.click()}>
                     {uploading ? (
                       <div>
-                        <div style={styles.uploadSpinner}>⏳</div>
+                        <div style={{ fontSize: '2rem', marginBottom: '8px' }}>⏳</div>
                         <p style={styles.uploadText}>Uploading to Cloudinary...</p>
                       </div>
                     ) : (
@@ -229,22 +231,11 @@ export default function AdminPage() {
                     )}
                   </div>
                 )}
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageUpload}
-                  style={{ display: 'none' }}
-                />
+                <input ref={fileInputRef} type="file" accept="image/*" onChange={handleImageUpload} style={{ display: 'none' }} />
                 {!form.image && !uploading && (
-                  <button style={styles.uploadBtn} onClick={() => fileInputRef.current?.click()}>
-                    Choose Image
-                  </button>
+                  <button style={styles.uploadBtn} onClick={() => fileInputRef.current?.click()}>Choose Image</button>
                 )}
               </div>
-              <p style={{ fontSize: '11px', color: 'var(--muted)', marginTop: '6px' }}>
-                Image will be stored on Cloudinary CDN for fast delivery worldwide.
-              </p>
             </div>
 
             <div className="form-group">
@@ -262,8 +253,7 @@ export default function AdminPage() {
               <div style={styles.colorPicker}>
                 {bgColors.map(color => (
                   <button key={color} onClick={() => setForm(f => ({ ...f, bg: color }))}
-                    style={{ ...styles.colorSwatch, background: color, border: form.bg === color ? '3px solid var(--dark)' : '2px solid transparent' }}
-                  />
+                    style={{ ...styles.colorSwatch, background: color, border: form.bg === color ? '3px solid var(--dark)' : '2px solid transparent' }} />
                 ))}
               </div>
             </div>
@@ -310,7 +300,7 @@ export default function AdminPage() {
           {products.map(product => (
             <div key={product.id} style={styles.tableRow}>
               <div style={styles.productCell}>
-                <div style={{ ...styles.productThumb, background: product.bg }}>
+                <div style={{ ...styles.productThumb, background: product.bg, overflow: 'hidden' }}>
                   {product.image
                     ? <img src={product.image} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '10px' }} />
                     : product.emoji
@@ -352,11 +342,10 @@ const styles = {
   formTitle: { fontFamily: 'var(--serif)', fontSize: '1.3rem', fontWeight: 700, marginBottom: '1.5rem' },
   formGrid: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 1.5rem' },
   imageUploadArea: { display: 'flex', flexDirection: 'column', gap: '10px' },
-  imagePreviewWrap: { position: 'relative', display: 'inline-block' },
+  imagePreviewWrap: { display: 'inline-block' },
   imagePreview: { width: '200px', height: '200px', objectFit: 'cover', borderRadius: '12px', border: '1px solid var(--border)', display: 'block' },
   removeImageBtn: { marginTop: '8px', background: '#FEF2F2', border: '1px solid #FECACA', color: '#DC2626', padding: '5px 14px', borderRadius: 'var(--radius-full)', fontSize: '12px', cursor: 'pointer', fontFamily: 'var(--sans)' },
-  uploadPlaceholder: { border: '2px dashed var(--border)', borderRadius: '12px', padding: '2rem', textAlign: 'center', cursor: 'pointer', background: 'var(--cream)', transition: 'border-color 0.2s' },
-  uploadSpinner: { fontSize: '2rem', marginBottom: '8px' },
+  uploadPlaceholder: { border: '2px dashed var(--border)', borderRadius: '12px', padding: '2rem', textAlign: 'center', cursor: 'pointer', background: 'var(--cream)' },
   uploadText: { fontSize: '14px', fontWeight: 500, color: 'var(--dark)', marginBottom: '4px' },
   uploadSubtext: { fontSize: '12px', color: 'var(--muted)' },
   uploadBtn: { background: 'var(--dark)', color: 'var(--cream)', border: 'none', padding: '9px 20px', borderRadius: 'var(--radius-full)', fontSize: '13px', fontWeight: 500, cursor: 'pointer', alignSelf: 'flex-start' },
@@ -370,7 +359,7 @@ const styles = {
   tableHeader: { display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 0.5fr 1fr 1fr', gap: '1rem', padding: '1rem 1.5rem', background: 'var(--cream)', fontSize: '11px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--muted)', borderBottom: '1px solid var(--border)' },
   tableRow: { display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 0.5fr 1fr 1fr', gap: '1rem', padding: '1rem 1.5rem', alignItems: 'center', borderBottom: '1px solid var(--border)' },
   productCell: { display: 'flex', gap: '12px', alignItems: 'center' },
-  productThumb: { width: '44px', height: '44px', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.4rem', flexShrink: 0, overflow: 'hidden' },
+  productThumb: { width: '44px', height: '44px', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.4rem', flexShrink: 0 },
   productName: { fontSize: '13px', fontWeight: 500, marginBottom: '3px' },
   cell: { fontSize: '13px', color: 'var(--dark)' },
   actions: { display: 'flex', gap: '8px' },
