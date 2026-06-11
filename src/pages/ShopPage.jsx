@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { productsAPI } from '@/lib/api'
 import { useCart } from '@/context/CartContext'
+import { categories } from '@/lib/categories'
 
-const categories = ['all', 'ceramics', 'textiles', 'decor']
 const sortOptions = [
   { value: 'default', label: 'Featured' },
   { value: 'price-asc', label: 'Price: Low → High' },
@@ -13,21 +13,25 @@ const sortOptions = [
 
 export default function ShopPage() {
   const [products, setProducts] = useState([])
+  const [allProducts, setAllProducts] = useState([])
   const [loading, setLoading] = useState(true)
   const [category, setCategory] = useState('all')
   const [sort, setSort] = useState('default')
   const [search, setSearch] = useState('')
-  const [maxPrice, setMaxPrice] = useState(200)
+  const [maxPrice, setMaxPrice] = useState(1000)
   const [addedIds, setAddedIds] = useState([])
   const { addItem } = useCart()
 
   useEffect(() => {
     setLoading(true)
-    productsAPI.getAll(category)
-      .then(setProducts)
+    productsAPI.getAll('all')
+      .then(data => {
+        setAllProducts(data)
+        setProducts(data)
+      })
       .catch(console.error)
       .finally(() => setLoading(false))
-  }, [category])
+  }, [])
 
   const handleAdd = (product) => {
     addItem(product)
@@ -35,7 +39,8 @@ export default function ShopPage() {
     setTimeout(() => setAddedIds(prev => prev.filter(id => id !== product.id)), 1200)
   }
 
-  let filtered = products
+  let filtered = allProducts
+    .filter(p => category === 'all' || p.category === category)
     .filter(p => p.name.toLowerCase().includes(search.toLowerCase()) || p.description.toLowerCase().includes(search.toLowerCase()))
     .filter(p => p.price <= maxPrice)
 
@@ -43,12 +48,20 @@ export default function ShopPage() {
   if (sort === 'price-desc') filtered = [...filtered].sort((a, b) => b.price - a.price)
   if (sort === 'rating') filtered = [...filtered].sort((a, b) => b.rating - a.rating)
 
-  const allPrices = products.map(p => p.price)
-  const minP = allPrices.length ? Math.min(...allPrices) : 0
-  const maxP = allPrices.length ? Math.max(...allPrices) : 200
+  const getCatCount = (id) => id === 'all' ? allProducts.length : allProducts.filter(p => p.category === id).length
 
   return (
     <div className="page">
+      <style>{`
+        .shop-layout { display: grid; grid-template-columns: 220px 1fr; gap: 3rem; align-items: start; max-width: 1100px; margin: 0 auto; padding: 2.5rem 2rem; }
+        .shop-sidebar { position: sticky; top: 90px; }
+        @media (max-width: 639px) {
+          .shop-layout { grid-template-columns: 1fr !important; gap: 1.5rem !important; padding: 1.5rem 1rem !important; }
+          .shop-sidebar { position: static !important; }
+        }
+      `}</style>
+
+      {/* Header */}
       <div style={styles.header}>
         <div style={styles.headerInner}>
           <div>
@@ -58,15 +71,6 @@ export default function ShopPage() {
           <p style={styles.headerDesc}>Thoughtfully designed pieces for modern living. Every item carefully selected for quality and longevity.</p>
         </div>
       </div>
-
-      <style>{`
-        .shop-layout { display: grid; grid-template-columns: 220px 1fr; gap: 3rem; align-items: start; max-width: 1100px; margin: 0 auto; padding: 2.5rem 2rem; }
-        .shop-sidebar { position: sticky; top: 90px; }
-        @media (max-width: 639px) {
-          .shop-layout { grid-template-columns: 1fr !important; gap: 1.5rem !important; padding: 1.5rem 1rem !important; }
-          .shop-sidebar { position: static !important; }
-        }
-      `}</style>
 
       <div className="shop-layout">
         {/* Sidebar */}
@@ -79,12 +83,14 @@ export default function ShopPage() {
           <div style={styles.sideSection}>
             <div style={styles.sideTitle}>Category</div>
             <div style={styles.catList}>
+              <button onClick={() => setCategory('all')}
+                style={{ ...styles.catBtn, background: category === 'all' ? 'var(--dark)' : 'transparent', color: category === 'all' ? 'var(--cream)' : 'var(--dark)' }}>
+                All <span style={{ opacity: 0.5, fontSize: '11px' }}>{getCatCount('all')}</span>
+              </button>
               {categories.map(cat => (
-                <button key={cat} onClick={() => setCategory(cat)} style={{ ...styles.catBtn, background: category === cat ? 'var(--dark)' : 'transparent', color: category === cat ? 'var(--cream)' : 'var(--dark)' }}>
-                  {cat.charAt(0).toUpperCase() + cat.slice(1)}
-                  <span style={{ opacity: 0.5, fontSize: '11px' }}>
-                    {cat === 'all' ? products.length : products.filter(p => p.category === cat).length}
-                  </span>
+                <button key={cat.id} onClick={() => setCategory(cat.id)}
+                  style={{ ...styles.catBtn, background: category === cat.id ? 'var(--dark)' : 'transparent', color: category === cat.id ? 'var(--cream)' : 'var(--dark)' }}>
+                  {cat.label} <span style={{ opacity: 0.5, fontSize: '11px' }}>{getCatCount(cat.id)}</span>
                 </button>
               ))}
             </div>
@@ -94,33 +100,26 @@ export default function ShopPage() {
             <div style={styles.sideTitle}>Sort By</div>
             <div style={styles.catList}>
               {sortOptions.map(opt => (
-                <button key={opt.value} onClick={() => setSort(opt.value)} style={{ ...styles.catBtn, background: sort === opt.value ? 'var(--dark)' : 'transparent', color: sort === opt.value ? 'var(--cream)' : 'var(--dark)' }}>
+                <button key={opt.value} onClick={() => setSort(opt.value)}
+                  style={{ ...styles.catBtn, background: sort === opt.value ? 'var(--dark)' : 'transparent', color: sort === opt.value ? 'var(--cream)' : 'var(--dark)' }}>
                   {opt.label}
                 </button>
               ))}
             </div>
           </div>
 
-          {/* Working price range slider */}
           <div style={styles.sideSection}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
               <div style={styles.sideTitle}>Max Price</div>
               <span style={{ fontFamily: 'var(--serif)', fontWeight: 600, fontSize: '15px' }}>${maxPrice}</span>
             </div>
-            <input
-              type="range"
-              min={minP}
-              max={maxP}
-              value={maxPrice}
-              onChange={e => setMaxPrice(Number(e.target.value))}
-              style={styles.slider}
-            />
+            <input type="range" min={0} max={1000} value={maxPrice} onChange={e => setMaxPrice(Number(e.target.value))} style={{ width: '100%' }} />
             <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '6px' }}>
-              <span style={{ fontSize: '11px', color: 'var(--muted)' }}>${minP}</span>
-              <span style={{ fontSize: '11px', color: 'var(--muted)' }}>${maxP}</span>
+              <span style={{ fontSize: '11px', color: 'var(--muted)' }}>$0</span>
+              <span style={{ fontSize: '11px', color: 'var(--muted)' }}>$1000</span>
             </div>
-            {maxPrice < maxP && (
-              <button onClick={() => setMaxPrice(maxP)} style={styles.resetBtn}>Reset</button>
+            {maxPrice < 1000 && (
+              <button onClick={() => setMaxPrice(1000)} style={styles.resetBtn}>Reset</button>
             )}
           </div>
         </aside>
@@ -129,10 +128,8 @@ export default function ShopPage() {
         <main style={{ minWidth: 0 }}>
           <div style={styles.toolbar}>
             <span style={styles.resultCount}>{loading ? 'Loading...' : `${filtered.length} products`}</span>
-            {(search || maxPrice < maxP) && (
-              <button style={styles.clearSearch} onClick={() => { setSearch(''); setMaxPrice(maxP) }}>
-                Clear filters ✕
-              </button>
+            {(search || maxPrice < 1000) && (
+              <button style={styles.clearSearch} onClick={() => { setSearch(''); setMaxPrice(1000) }}>Clear filters ✕</button>
             )}
           </div>
 
@@ -142,7 +139,7 @@ export default function ShopPage() {
             <div style={styles.empty}>
               <div style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>🔍</div>
               <p style={{ color: 'var(--muted)' }}>No products match your filters</p>
-              <button style={styles.clearBtn} onClick={() => { setSearch(''); setMaxPrice(maxP) }}>Clear filters</button>
+              <button style={styles.clearBtn} onClick={() => { setSearch(''); setMaxPrice(1000); setCategory('all') }}>Clear filters</button>
             </div>
           ) : (
             <div style={styles.grid}>
@@ -185,34 +182,28 @@ export default function ShopPage() {
       </div>
 
       <style>{`
-        input[type='range'] { -webkit-appearance: none; appearance: none; width: 100%; height: 4px; background: linear-gradient(to right, var(--accent) 0%, var(--accent) ${((maxPrice - minP) / (maxP - minP)) * 100}%, var(--border) ${((maxPrice - minP) / (maxP - minP)) * 100}%, var(--border) 100%); border-radius: 2px; outline: none; cursor: pointer; }
+        input[type='range'] { -webkit-appearance: none; appearance: none; width: 100%; height: 4px; background: linear-gradient(to right, var(--accent) 0%, var(--accent) ${((maxPrice) / 1000) * 100}%, var(--border) ${((maxPrice) / 1000) * 100}%, var(--border) 100%); border-radius: 2px; outline: none; cursor: pointer; }
         input[type='range']::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background: var(--dark); cursor: pointer; border: 2px solid var(--cream); box-shadow: 0 1px 4px rgba(0,0,0,0.2); }
-        input[type='range']::-moz-range-thumb { width: 18px; height: 18px; border-radius: 50%; background: var(--dark); cursor: pointer; border: 2px solid var(--cream); }
       `}</style>
     </div>
   )
 }
 
 const styles = {
-  header: { 
-    background: 'var(--dark)', 
-    color: 'var(--cream)', 
-    padding: '4rem 2rem',
-    backgroundImage: 'linear-gradient(rgba(26,24,20,0.82), rgba(26,24,20,0.82)), url(https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=1200&q=80)',
-    backgroundSize: 'cover',
-    backgroundPosition: 'center',
+  header: {
+    color: 'var(--cream)', padding: '4rem 2rem',
+    backgroundImage: 'linear-gradient(rgba(26,24,20,0.75), rgba(26,24,20,0.75)), url(/images/shop-hero.png)',
+    backgroundSize: 'cover', backgroundPosition: 'center',
+    backgroundColor: 'var(--dark)',
   },
   headerInner: { maxWidth: '1100px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '1rem' },
   headerLabel: { fontSize: '11px', fontWeight: 500, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--accent)', marginBottom: '0.5rem' },
   headerTitle: { fontFamily: 'var(--serif)', fontSize: '3rem', fontWeight: 700 },
-  headerDesc: { color: 'rgba(247,244,239,0.6)', fontSize: '15px', lineHeight: 1.7 },
-  layout: { maxWidth: '1100px', margin: '0 auto', padding: '2.5rem 2rem', display: 'grid', gridTemplateColumns: '220px 1fr', gap: '3rem', alignItems: 'start' },
-  sidebar: { position: 'sticky', top: '90px' },
+  headerDesc: { color: 'rgba(247,244,239,0.7)', fontSize: '15px', lineHeight: 1.7, maxWidth: '500px' },
   sideSection: { marginBottom: '2rem', paddingBottom: '2rem', borderBottom: '1px solid var(--border)' },
   sideTitle: { fontSize: '11px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--muted)', marginBottom: '12px' },
   catList: { display: 'flex', flexDirection: 'column', gap: '4px' },
   catBtn: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '7px 12px', borderRadius: 'var(--radius)', border: 'none', cursor: 'pointer', fontSize: '13px', fontWeight: 500, fontFamily: 'var(--sans)', textAlign: 'left', transition: 'all 0.15s' },
-  slider: { width: '100%' },
   resetBtn: { marginTop: '8px', fontSize: '11px', color: 'var(--muted)', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline', padding: 0 },
   toolbar: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' },
   resultCount: { fontSize: '13px', color: 'var(--muted)' },
@@ -221,8 +212,8 @@ const styles = {
   empty: { textAlign: 'center', padding: '4rem' },
   clearBtn: { marginTop: '1rem', background: 'var(--dark)', color: 'var(--cream)', border: 'none', padding: '10px 24px', borderRadius: 'var(--radius-full)', cursor: 'pointer', fontSize: '13px' },
   grid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '16px' },
-  card: { background: 'var(--card-bg)', borderRadius: '16px', overflow: 'hidden', border: '1px solid var(--border)', transition: 'transform 0.2s, box-shadow 0.2s' },
-  cardImg: { height: '200px', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' },
+  card: { background: 'var(--card-bg)', borderRadius: '16px', overflow: 'hidden', border: '1px solid var(--border)' },
+  cardImg: { height: '200px', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden' },
   badge: { position: 'absolute', top: '12px', left: '12px' },
   cardBody: { padding: '1rem 1rem 0.5rem' },
   cardCat: { fontSize: '10px', color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '4px' },
