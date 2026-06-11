@@ -29,6 +29,13 @@ export default function HomePage() {
 
   return (
     <div className="page">
+      {/* Preload hero images */}
+      <div style={{ display: 'none' }}>
+        {heroSwatches.map(cat => (
+          <img key={cat.id} src={cat.image} alt="" />
+        ))}
+      </div>
+
       <style>{`
         .hero-section { border-bottom: 1px solid var(--border); }
         .hero-inner { max-width: 1100px; margin: 0 auto; padding: 4rem 2rem 3rem; display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: center; }

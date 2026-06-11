@@ -30,6 +30,13 @@ export default function CollectionsPage() {
 
   return (
     <div className="page">
+      {/* Hidden images to preload all category backgrounds */}
+      <div style={{ display: 'none' }}>
+        {categories.map(cat => (
+          <img key={cat.id} src={cat.image} alt="" />
+        ))}
+      </div>
+
       <style>{`
         .col-tabs { display: flex; max-width: 1100px; margin: 0 auto; padding: 0 1rem; overflow-x: auto; scrollbar-width: none; }
         .col-tabs::-webkit-scrollbar { display: none; }
