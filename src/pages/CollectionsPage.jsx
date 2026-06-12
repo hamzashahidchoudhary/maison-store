@@ -52,12 +52,14 @@ export default function CollectionsPage() {
       `}</style>
 
       {/* Hero */}
-      <div style={{
-        backgroundImage: `linear-gradient(${active.overlayColor}, ${active.overlayColor}), url(${active.image})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        transition: 'background-image 0.3s',
-      }}>
+      <div
+        key={activeTab}
+        style={{
+          backgroundImage: `linear-gradient(${active.overlayColor}, ${active.overlayColor}), url(${active.image})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+        }}
+      >
         <div className="col-hero-inner" style={styles.heroInner}>
           <div>
             <span style={styles.heroTag}>{active.tag}</span>
