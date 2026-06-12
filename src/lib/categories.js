@@ -1,6 +1,3 @@
-// Central categories configuration
-// Used across HomePage, ShopPage, CollectionsPage, AdminPage
-
 export const categories = [
   {
     id: 'ceramics',
@@ -10,7 +7,7 @@ export const categories = [
     tag: 'Artisan Made',
     image: '/images/hero-ceramics.png',
     lightBg: '#F5EEE6',
-    overlayColor: 'rgba(139,115,85,0.75)',
+    overlayColor: 'rgba(139,115,85,0.55)',
   },
   {
     id: 'textiles',
@@ -20,7 +17,7 @@ export const categories = [
     tag: 'Natural Fibres',
     image: '/images/hero-textiles.png',
     lightBg: '#FBF5EA',
-    overlayColor: 'rgba(200,169,110,0.75)',
+    overlayColor: 'rgba(200,169,110,0.55)',
   },
   {
     id: 'decor',
@@ -30,7 +27,7 @@ export const categories = [
     tag: 'Limited Edition',
     image: '/images/hero-decor.png',
     lightBg: '#F5F0EA',
-    overlayColor: 'rgba(176,160,144,0.75)',
+    overlayColor: 'rgba(176,160,144,0.55)',
   },
   {
     id: 'furniture',
@@ -40,7 +37,7 @@ export const categories = [
     tag: 'Solid Wood',
     image: '/images/hero-furniture.png',
     lightBg: '#F0EBE3',
-    overlayColor: 'rgba(120,95,75,0.75)',
+    overlayColor: 'rgba(120,95,75,0.55)',
   },
   {
     id: 'lighting',
@@ -50,7 +47,7 @@ export const categories = [
     tag: 'Handmade',
     image: '/images/hero-lighting.png',
     lightBg: '#FDF8EE',
-    overlayColor: 'rgba(180,155,90,0.75)',
+    overlayColor: 'rgba(180,155,90,0.55)',
   },
   {
     id: 'garden',
@@ -60,7 +57,7 @@ export const categories = [
     tag: 'Outdoor Living',
     image: '/images/hero-garden.png',
     lightBg: '#EEF4EE',
-    overlayColor: 'rgba(80,110,80,0.75)',
+    overlayColor: 'rgba(80,110,80,0.55)',
   },
   {
     id: 'bath',
@@ -70,7 +67,7 @@ export const categories = [
     tag: 'Self Care',
     image: '/images/hero-bath.png',
     lightBg: '#EEF2F5',
-    overlayColor: 'rgba(100,130,150,0.75)',
+    overlayColor: 'rgba(100,130,150,0.55)',
   },
   {
     id: 'storage',
@@ -80,7 +77,7 @@ export const categories = [
     tag: 'Functional Design',
     image: '/images/hero-storage.png',
     lightBg: '#F2EEE8',
-    overlayColor: 'rgba(140,120,100,0.75)',
+    overlayColor: 'rgba(140,120,100,0.55)',
   },
 ]
 
