@@ -1,222 +1,130 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { CATEGORIES } from '../lib/categories';
+import { categories } from '../lib/categories';
 
 export default function CollectionsPage() {
-  const [activeCategory, setActiveCategory] = useState(CATEGORIES[0]);
+  const [active, setActive] = useState(categories[0]);
 
   return (
-    <div className="collections-page" style={{ minHeight: '100vh' }}>
-      {/* Hero Section */}
-      <div
-        className="collections-hero"
-        style={{
-          position: 'relative',
-          height: '60vh',
-          overflow: 'hidden',
-        }}
-      >
-        {/* Background images — one per category, only active one visible */}
-        {CATEGORIES.map((cat) => (
+    <div style={{ minHeight: '100vh' }}>
+
+      {/* ── Hero ── */}
+      <div style={{ position: 'relative', height: '60vh', overflow: 'hidden' }}>
+
+        {categories.map((cat) => (
           <img
             key={cat.id}
             src={cat.image}
-            alt={cat.name}
+            alt={cat.label}
             style={{
-              position: 'absolute',
-              inset: 0,
-              width: '100%',
-              height: '100%',
-              objectFit: 'cover',
-              opacity: activeCategory.id === cat.id ? 1 : 0,
+              position: 'absolute', inset: 0,
+              width: '100%', height: '100%', objectFit: 'cover',
+              opacity: active.id === cat.id ? 1 : 0,
               transition: 'opacity 0.6s ease',
             }}
           />
         ))}
 
-        {/* Overlay */}
-        <div
-          style={{
-            position: 'absolute',
-            inset: 0,
-            backgroundColor: activeCategory.overlayColor,
-            transition: 'background-color 0.6s ease',
-            zIndex: 1,
-          }}
-        />
+        <div style={{
+          position: 'absolute', inset: 0,
+          backgroundColor: active.overlayColor,
+          transition: 'background-color 0.6s ease',
+          zIndex: 1,
+        }} />
 
-        {/* Hero text */}
-        <div
-          style={{
-            position: 'relative',
-            zIndex: 2,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            height: '100%',
-            textAlign: 'center',
-            padding: '0 1rem',
-          }}
-        >
-          <p
-            style={{
-              fontSize: '0.75rem',
-              letterSpacing: '0.2em',
-              textTransform: 'uppercase',
-              color: activeCategory.lightBg ? '#4a4a4a' : 'rgba(255,255,255,0.7)',
-              marginBottom: '0.75rem',
-              transition: 'color 0.4s ease',
-            }}
-          >
-            Maison Collections
+        <div style={{
+          position: 'relative', zIndex: 2,
+          display: 'flex', flexDirection: 'column',
+          alignItems: 'center', justifyContent: 'center',
+          height: '100%', textAlign: 'center', padding: '0 1.5rem',
+        }}>
+          <p style={{
+            fontSize: '0.7rem', letterSpacing: '0.2em',
+            textTransform: 'uppercase', marginBottom: '0.5rem',
+            color: active.lightBg ? '#555' : 'rgba(255,255,255,0.65)',
+            transition: 'color 0.4s ease',
+          }}>
+            {active.tag}
           </p>
-          <h1
-            style={{
-              fontSize: 'clamp(2rem, 5vw, 4rem)',
-              fontWeight: 300,
-              letterSpacing: '0.05em',
-              color: activeCategory.lightBg ? '#1a1a1a' : '#ffffff',
-              marginBottom: '1rem',
-              transition: 'color 0.4s ease',
-            }}
-          >
-            {activeCategory.name}
+          <h1 style={{
+            fontSize: 'clamp(2rem, 5vw, 4rem)', fontWeight: 300,
+            letterSpacing: '0.05em', marginBottom: '1rem',
+            color: active.lightBg ? '#1a1a1a' : '#ffffff',
+            transition: 'color 0.4s ease',
+          }}>
+            {active.label}
           </h1>
-          <p
-            style={{
-              fontSize: '1rem',
-              color: activeCategory.lightBg ? '#666' : 'rgba(255,255,255,0.75)',
-              maxWidth: '480px',
-              lineHeight: 1.6,
-              transition: 'color 0.4s ease',
-            }}
-          >
-            {activeCategory.description}
+          <p style={{
+            fontSize: '1rem', maxWidth: '480px', lineHeight: 1.7,
+            color: active.lightBg ? '#666' : 'rgba(255,255,255,0.75)',
+            transition: 'color 0.4s ease',
+          }}>
+            {active.subtitle}
           </p>
         </div>
       </div>
 
-      {/* Category Tab Navigation */}
-      <div
-        style={{
-          display: 'flex',
-          overflowX: 'auto',
-          borderBottom: '1px solid #e5e5e5',
-          backgroundColor: '#fff',
-          scrollbarWidth: 'none',
-        }}
-      >
-        {CATEGORIES.map((cat) => (
+      {/* ── Tab Bar ── */}
+      <div style={{
+        display: 'flex', overflowX: 'auto',
+        borderBottom: '1px solid #e5e5e5',
+        backgroundColor: '#fff', scrollbarWidth: 'none',
+      }}>
+        {categories.map((cat) => (
           <button
             key={cat.id}
-            onClick={() => setActiveCategory(cat)}
+            onClick={() => setActive(cat)}
             style={{
-              flex: '0 0 auto',
-              padding: '1rem 1.5rem',
-              fontSize: '0.8rem',
-              letterSpacing: '0.12em',
-              textTransform: 'uppercase',
-              background: 'none',
-              border: 'none',
-              borderBottom: activeCategory.id === cat.id ? '2px solid #1a1a1a' : '2px solid transparent',
-              color: activeCategory.id === cat.id ? '#1a1a1a' : '#888',
-              cursor: 'pointer',
-              transition: 'all 0.2s ease',
-              whiteSpace: 'nowrap',
+              flex: '0 0 auto', padding: '1rem 1.5rem',
+              fontSize: '0.78rem', letterSpacing: '0.1em',
+              textTransform: 'uppercase', background: 'none', border: 'none',
+              borderBottom: active.id === cat.id ? '2px solid #1a1a1a' : '2px solid transparent',
+              color: active.id === cat.id ? '#1a1a1a' : '#999',
+              cursor: 'pointer', transition: 'all 0.2s ease', whiteSpace: 'nowrap',
             }}
           >
-            {cat.name}
+            {cat.label}
           </button>
         ))}
       </div>
 
-      {/* Products / Browse Section */}
+      {/* ── Body ── */}
       <div style={{ padding: '3rem 2rem', maxWidth: '1200px', margin: '0 auto' }}>
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            marginBottom: '2rem',
-          }}
-        >
-          <h2
-            style={{
-              fontSize: '1.1rem',
-              fontWeight: 400,
-              letterSpacing: '0.08em',
-              textTransform: 'uppercase',
-              color: '#1a1a1a',
-            }}
-          >
-            {activeCategory.name}
-          </h2>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+          <div>
+            <h2 style={{ fontSize: '1.1rem', fontWeight: 400, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#1a1a1a', marginBottom: '0.3rem' }}>
+              {active.label}
+            </h2>
+            <p style={{ fontSize: '0.9rem', color: '#888' }}>{active.desc}</p>
+          </div>
           <Link
-            to={`/shop?category=${activeCategory.id}`}
+            to={`/shop?category=${active.id}`}
             style={{
-              fontSize: '0.8rem',
-              letterSpacing: '0.12em',
-              textTransform: 'uppercase',
-              color: '#1a1a1a',
-              textDecoration: 'none',
-              borderBottom: '1px solid #1a1a1a',
-              paddingBottom: '2px',
+              flexShrink: 0, marginLeft: '2rem',
+              fontSize: '0.78rem', letterSpacing: '0.12em',
+              textTransform: 'uppercase', color: '#1a1a1a',
+              textDecoration: 'none', borderBottom: '1px solid #1a1a1a', paddingBottom: '2px',
             }}
           >
             View All
           </Link>
         </div>
 
-        {/* Category grid preview */}
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))',
-            gap: '1.5rem',
-          }}
-        >
-          {/* Placeholder cards — replace with real product fetching if needed */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '1.5rem' }}>
           {[1, 2, 3, 4].map((i) => (
-            <Link
-              key={i}
-              to={`/shop?category=${activeCategory.id}`}
-              style={{ textDecoration: 'none', color: 'inherit' }}
-            >
-              <div
-                style={{
-                  aspectRatio: '3/4',
-                  backgroundColor: '#f5f5f5',
-                  overflow: 'hidden',
-                  position: 'relative',
-                }}
-              >
+            <Link key={i} to={`/shop?category=${active.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+              <div style={{ aspectRatio: '3/4', overflow: 'hidden', backgroundColor: '#f5f5f5' }}>
                 <img
-                  src={activeCategory.image}
-                  alt={activeCategory.name}
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                    objectFit: 'cover',
-                    transition: 'transform 0.4s ease',
-                  }}
+                  src={active.image}
+                  alt={active.label}
+                  style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.4s ease' }}
                   onMouseEnter={(e) => (e.currentTarget.style.transform = 'scale(1.05)')}
                   onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1)')}
                 />
               </div>
               <div style={{ padding: '0.75rem 0' }}>
-                <p style={{ fontSize: '0.85rem', color: '#888', letterSpacing: '0.05em' }}>
-                  {activeCategory.name}
-                </p>
-                <p
-                  style={{
-                    fontSize: '0.95rem',
-                    color: '#1a1a1a',
-                    marginTop: '0.25rem',
-                  }}
-                >
-                  Shop the Collection →
-                </p>
+                <p style={{ fontSize: '0.8rem', color: '#888', letterSpacing: '0.05em' }}>{active.label}</p>
+                <p style={{ fontSize: '0.9rem', color: '#1a1a1a', marginTop: '0.2rem' }}>Shop the Collection →</p>
               </div>
             </Link>
           ))}
