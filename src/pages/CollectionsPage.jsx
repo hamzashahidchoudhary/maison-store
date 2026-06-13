@@ -30,38 +30,54 @@ export default function CollectionsPage() {
 
   return (
     <div className="page">
-      {/* Hidden images to preload all category backgrounds */}
-      <div style={{ display: 'none' }}>
-        {categories.map(cat => (
-          <img key={cat.id} src={cat.image} alt="" />
-        ))}
-      </div>
-
       <style>{`
-        .col-tabs { display: flex; max-width: 1100px; margin: 0 auto; padding: 0 1rem; overflow-x: auto; scrollbar-width: none; }
+        .col-hero {
+          position: relative;
+          overflow: hidden;
+        }
+        .col-hero-bg {
+          position: absolute;
+          inset: 0;
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          z-index: 0;
+        }
+        .col-hero-overlay {
+          position: absolute;
+          inset: 0;
+          z-index: 1;
+        }
+        .col-hero-content {
+          position: relative;
+          z-index: 2;
+        }
+        .col-tabs { display: flex; max-width: 1100px; margin: 0 auto; padding: 0 1rem; overflow-x: auto; scrollbar-width: none; position: relative; z-index: 2; }
         .col-tabs::-webkit-scrollbar { display: none; }
         .col-tab { display: flex; align-items: center; gap: 6px; padding: 1rem 1.2rem; color: rgba(255,255,255,0.75); border: none; cursor: pointer; font-size: 13px; font-weight: 500; font-family: var(--sans); transition: all 0.2s; border-bottom: 2px solid transparent; background: transparent; white-space: nowrap; flex-shrink: 0; }
         .col-tab.active, .col-tab:hover { color: white; border-bottom-color: white; background: rgba(255,255,255,0.1); }
         .col-tab-count { background: rgba(255,255,255,0.2); color: white; border-radius: 20px; padding: 1px 7px; font-size: 11px; }
         @media (max-width: 639px) {
-          .col-hero-inner { grid-template-columns: 1fr !important; padding: 2.5rem 1.2rem 1rem !important; }
           .col-products-inner { padding: 1.5rem 1rem !important; }
           .col-grid { grid-template-columns: 1fr !important; }
           .col-other-grid { grid-template-columns: 1fr 1fr !important; }
         }
       `}</style>
 
-      {/* Hero */}
-      <div
-        key={activeTab}
-        style={{
-          backgroundImage: `linear-gradient(${active.overlayColor}, ${active.overlayColor}), url(${active.image})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-        }}
-      >
-        <div className="col-hero-inner" style={styles.heroInner}>
-          <div>
+      {/* Hero with real img tag */}
+      <div className="col-hero">
+        <img
+          key={activeTab}
+          src={active.image}
+          alt={active.label}
+          className="col-hero-bg"
+        />
+        <div
+          className="col-hero-overlay"
+          style={{ background: active.overlayColor }}
+        />
+        <div className="col-hero-content">
+          <div style={styles.heroInner}>
             <span style={styles.heroTag}>{active.tag}</span>
             <h1 style={styles.heroTitle}>{active.label}</h1>
             <p style={styles.heroSubtitle}>{active.subtitle}</p>
@@ -87,20 +103,20 @@ export default function CollectionsPage() {
               </div>
             </div>
           </div>
-        </div>
 
-        {/* Tabs */}
-        <div className="col-tabs">
-          {categories.map(cat => (
-            <button
-              key={cat.id}
-              className={`col-tab${activeTab === cat.id ? ' active' : ''}`}
-              onClick={() => setActiveTab(cat.id)}
-            >
-              {cat.label}
-              <span className="col-tab-count">{getProductsByCategory(cat.id).length}</span>
-            </button>
-          ))}
+          {/* Tabs */}
+          <div className="col-tabs">
+            {categories.map(cat => (
+              <button
+                key={cat.id}
+                className={`col-tab${activeTab === cat.id ? ' active' : ''}`}
+                onClick={() => setActiveTab(cat.id)}
+              >
+                {cat.label}
+                <span className="col-tab-count">{getProductsByCategory(cat.id).length}</span>
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -165,20 +181,19 @@ export default function CollectionsPage() {
                     .filter(cat => cat.id !== activeTab)
                     .slice(0, 4)
                     .map(cat => (
-                      <button
+                      <div
                         key={cat.id}
                         onClick={() => { setActiveTab(cat.id); window.scrollTo({ top: 0, behavior: 'smooth' }) }}
-                        style={{
-                          ...styles.otherCard,
-                          backgroundImage: `linear-gradient(${cat.overlayColor}, ${cat.overlayColor}), url(${cat.image})`,
-                          backgroundSize: 'cover',
-                          backgroundPosition: 'center',
-                        }}
+                        style={{ ...styles.otherCard, position: 'relative', overflow: 'hidden', cursor: 'pointer' }}
                       >
-                        <div style={styles.otherCardTitle}>{cat.label}</div>
-                        <div style={styles.otherCardSub}>{getProductsByCategory(cat.id).length} pieces</div>
-                        <div style={styles.otherCardArrow}>Explore →</div>
-                      </button>
+                        <img src={cat.image} alt={cat.label} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', zIndex: 0 }} />
+                        <div style={{ position: 'absolute', inset: 0, background: cat.overlayColor, zIndex: 1 }} />
+                        <div style={{ position: 'relative', zIndex: 2 }}>
+                          <div style={styles.otherCardTitle}>{cat.label}</div>
+                          <div style={styles.otherCardSub}>{getProductsByCategory(cat.id).length} pieces</div>
+                          <div style={styles.otherCardArrow}>Explore →</div>
+                        </div>
+                      </div>
                     ))}
                 </div>
               </div>
@@ -191,7 +206,7 @@ export default function CollectionsPage() {
 }
 
 const styles = {
-  heroInner: { maxWidth: '1100px', margin: '0 auto', padding: '3.5rem 2rem 2rem', display: 'grid', gridTemplateColumns: '1fr', gap: '2rem' },
+  heroInner: { maxWidth: '1100px', margin: '0 auto', padding: '3.5rem 2rem 2rem' },
   heroTag: { display: 'inline-block', background: 'rgba(255,255,255,0.2)', color: 'white', fontSize: '11px', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', padding: '4px 12px', borderRadius: '20px', marginBottom: '1rem' },
   heroTitle: { fontFamily: 'var(--serif)', fontSize: 'clamp(2.2rem,5vw,3.5rem)', fontWeight: 700, color: 'white', marginBottom: '0.4rem', lineHeight: 1.1 },
   heroSubtitle: { fontSize: '14px', color: 'rgba(255,255,255,0.75)', fontStyle: 'italic', marginBottom: '1rem' },
@@ -216,7 +231,7 @@ const styles = {
   otherCollections: { borderTop: '1px solid var(--border)', paddingTop: '2.5rem' },
   otherTitle: { fontFamily: 'var(--serif)', fontSize: '1.3rem', fontWeight: 700, marginBottom: '1.5rem', textAlign: 'center' },
   otherGrid: { display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px' },
-  otherCard: { border: 'none', borderRadius: '16px', padding: '1.5rem', cursor: 'pointer', textAlign: 'left', transition: 'transform 0.2s', minHeight: '120px', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' },
+  otherCard: { border: 'none', borderRadius: '16px', padding: '1.5rem', minHeight: '120px', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' },
   otherCardTitle: { fontFamily: 'var(--serif)', fontSize: '1rem', fontWeight: 700, color: 'white', marginBottom: '2px' },
   otherCardSub: { fontSize: '12px', color: 'rgba(255,255,255,0.7)', marginBottom: '8px' },
   otherCardArrow: { fontSize: '12px', color: 'white', fontWeight: 500 },
