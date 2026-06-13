@@ -42,15 +42,18 @@ export default function CollectionsPage() {
           height: 100%;
           object-fit: cover;
           z-index: 0;
+          display: block;
         }
         .col-hero-overlay {
           position: absolute;
           inset: 0;
           z-index: 1;
+          pointer-events: none;
         }
         .col-hero-content {
           position: relative;
           z-index: 2;
+          min-height: 350px;
         }
         .col-tabs { display: flex; max-width: 1100px; margin: 0 auto; padding: 0 1rem; overflow-x: auto; scrollbar-width: none; position: relative; z-index: 2; }
         .col-tabs::-webkit-scrollbar { display: none; }
@@ -65,7 +68,7 @@ export default function CollectionsPage() {
       `}</style>
 
       {/* Hero with real img tag */}
-      <div className="col-hero">
+      <div className="col-hero" style={{ minHeight: '400px' }}>
         <img
           key={activeTab}
           src={active.image}
