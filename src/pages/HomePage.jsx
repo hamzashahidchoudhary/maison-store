@@ -78,19 +78,26 @@ export default function HomePage() {
             {heroSwatches.map((cat, i) => (
               <Link
                 key={cat.id}
-                to={`/collections#${cat.id}`}
+                to={`/collections`}
                 style={{
                   ...styles.swatch,
-                  backgroundImage: `linear-gradient(${cat.overlayColor}, ${cat.overlayColor}), url(${cat.image})`,
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center',
                   gridRow: i === 0 ? 'span 2' : 'auto',
                   minHeight: i === 0 ? '240px' : '110px',
                   textDecoration: 'none',
+                  position: 'relative',
+                  overflow: 'hidden',
                 }}
               >
-                <span style={styles.swatchLabel}>{cat.tag}</span>
-                <span style={styles.swatchTitle}>{cat.label}</span>
+                <img
+                  src={cat.image}
+                  alt={cat.label}
+                  style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', zIndex: 0 }}
+                />
+                <div style={{ position: 'absolute', inset: 0, background: cat.overlayColor, zIndex: 1 }} />
+                <div style={{ position: 'relative', zIndex: 2 }}>
+                  <span style={styles.swatchLabel}>{cat.tag}</span><br />
+                  <span style={styles.swatchTitle}>{cat.label}</span>
+                </div>
               </Link>
             ))}
           </div>
