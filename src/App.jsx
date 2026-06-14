@@ -4,6 +4,7 @@ import { CartProvider } from '@/context/CartContext'
 import Navbar from '@/components/layout/Navbar'
 import Footer from '@/components/layout/Footer'
 import CartDrawer from '@/components/cart/CartDrawer'
+import ScrollToTop from '@/components/ScrollToTop'
 import HomePage from '@/pages/HomePage'
 import ShopPage from '@/pages/ShopPage'
 import CollectionsPage from '@/pages/CollectionsPage'
@@ -19,6 +20,7 @@ export default function App() {
     <AuthProvider>
       <CartProvider>
         <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+          <ScrollToTop />
           <Navbar />
           <CartDrawer />
           <main style={{ flex: 1 }}>
