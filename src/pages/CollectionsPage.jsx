@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { productsAPI } from '@/lib/api'
 import { useCart } from '@/context/CartContext'
+import { useAuth } from '@/context/AuthContext'
 import { categories, getCategoryById } from '@/lib/categories'
 
 export default function CollectionsPage() {
@@ -10,6 +11,7 @@ export default function CollectionsPage() {
   const [activeTab, setActiveTab] = useState('ceramics')
   const [addedIds, setAddedIds] = useState([])
   const { addItem } = useCart()
+  const { user } = useAuth()
 
   useEffect(() => {
     productsAPI.getAll('all')
@@ -132,7 +134,9 @@ export default function CollectionsPage() {
             <div style={{ textAlign: 'center', padding: '4rem' }}>
               <div style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>🛒</div>
               <p style={{ color: 'var(--muted)', marginBottom: '1rem' }}>No products in this category yet.</p>
-              <Link to="/admin" style={{ fontSize: '13px', color: 'var(--accent)' }}>Add products in Admin →</Link>
+              {user?.role === 'ADMIN' && (
+                <Link to="/admin" style={{ fontSize: '13px', color: 'var(--accent)' }}>Add products in Admin →</Link>
+              )}
             </div>
           ) : (
             <>
