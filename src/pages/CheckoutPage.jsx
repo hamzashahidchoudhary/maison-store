@@ -13,15 +13,27 @@ export default function CheckoutPage() {
   const [step, setStep] = useState(0)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [fieldError, setFieldError] = useState('')
   const [form, setForm] = useState({
     name: user?.name || '', email: user?.email || '',
     address: '', city: '', postcode: '', country: '',
-    cardNumber: '', expiry: '', cvv: '',
+    paymentMethod: 'cod',
   })
 
   const update = (field) => (e) => setForm(f => ({ ...f, [field]: e.target.value }))
   const shipping = totalPrice >= 75 ? 0 : 8.95
   const total = totalPrice + shipping
+
+  const handleContinueToPayment = () => {
+    setFieldError('')
+    if (!form.name.trim()) return setFieldError('Please enter your full name.')
+    if (!form.email.trim()) return setFieldError('Please enter your email.')
+    if (!form.address.trim()) return setFieldError('Please enter your address.')
+    if (!form.city.trim()) return setFieldError('Please enter your city.')
+    if (!form.postcode.trim()) return setFieldError('Please enter your postcode.')
+    if (!form.country.trim()) return setFieldError('Please enter your country.')
+    setStep(1)
+  }
 
   const handlePlaceOrder = async () => {
     setLoading(true)
@@ -103,30 +115,30 @@ export default function CheckoutPage() {
                   <input className="input" value={form.country} onChange={update('country')} placeholder="United Kingdom" />
                 </div>
               </div>
-              <button style={styles.nextBtn} onClick={() => setStep(1)}>Continue to Payment →</button>
+              {fieldError && <div style={styles.fieldError}>{fieldError}</div>}
+              <button style={styles.nextBtn} onClick={handleContinueToPayment}>Continue to Payment →</button>
             </div>
           )}
 
           {step === 1 && (
             <div className="card">
-              <h2 style={styles.sectionTitle}>Payment Details</h2>
-              <div style={styles.stripeNote}>
-                🔒 In production this uses <strong>Stripe Elements</strong> — card details go directly to Stripe, never your server.
-              </div>
-              <div className="form-group">
-                <label className="label">Card Number</label>
-                <input className="input" value={form.cardNumber} onChange={update('cardNumber')} placeholder="4242 4242 4242 4242" maxLength={19} />
-              </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 1rem' }}>
-                <div className="form-group">
-                  <label className="label">Expiry</label>
-                  <input className="input" value={form.expiry} onChange={update('expiry')} placeholder="MM / YY" />
+              <h2 style={styles.sectionTitle}>Payment Method</h2>
+
+              <div style={styles.codCard}>
+                <div style={styles.codIcon}>💵</div>
+                <div>
+                  <div style={styles.codTitle}>Cash on Delivery</div>
+                  <div style={styles.codDesc}>Pay with cash when your order arrives at your door. No card required.</div>
                 </div>
-                <div className="form-group">
-                  <label className="label">CVV</label>
-                  <input className="input" value={form.cvv} onChange={update('cvv')} placeholder="123" maxLength={4} />
-                </div>
+                <div style={styles.codCheck}>✓</div>
               </div>
+
+              <div style={styles.codInfo}>
+                <div style={styles.codInfoItem}>📦 Your order will be prepared and shipped</div>
+                <div style={styles.codInfoItem}>🚚 Pay the delivery person when it arrives</div>
+                <div style={styles.codInfoItem}>✅ No online payment needed</div>
+              </div>
+
               <div style={styles.btnRow}>
                 <button style={styles.backBtn} onClick={() => setStep(0)}>← Back</button>
                 <button style={styles.nextBtn} onClick={() => setStep(2)}>Review Order →</button>
@@ -143,8 +155,9 @@ export default function CheckoutPage() {
                 <div style={{ color: 'var(--muted)', fontSize: '14px' }}>{form.address}, {form.city} {form.postcode}</div>
               </div>
               <div style={styles.confirmSection}>
-                <div style={styles.confirmLabel}>Payment</div>
-                <div style={styles.confirmValue}>Card ending in {form.cardNumber.slice(-4) || '****'}</div>
+                <div style={styles.confirmLabel}>Payment Method</div>
+                <div style={styles.confirmValue}>💵 Cash on Delivery</div>
+                <div style={{ color: 'var(--muted)', fontSize: '14px' }}>Pay when your order arrives</div>
               </div>
               {error && <div style={styles.errorBox}>{error}</div>}
               <div style={styles.btnRow}>
@@ -191,7 +204,14 @@ export default function CheckoutPage() {
 }
 
 const styles = {
-  back: { fontSize: '13px', color: 'var(--muted)', display: 'inline-flex', alignItems: 'center', gap: '4px', marginBottom: '1.5rem' },
+  fieldError: { background: '#FEF2F2', color: '#DC2626', border: '1px solid #FECACA', borderRadius: 'var(--radius)', padding: '10px 14px', fontSize: '13px', marginBottom: '1rem' },
+  codCard: { display: 'flex', alignItems: 'center', gap: '16px', background: '#F0FDF4', border: '2px solid #86EFAC', borderRadius: '12px', padding: '1.2rem', marginBottom: '1.2rem' },
+  codIcon: { fontSize: '2rem', flexShrink: 0 },
+  codTitle: { fontFamily: 'var(--serif)', fontSize: '1rem', fontWeight: 700, marginBottom: '4px' },
+  codDesc: { fontSize: '13px', color: 'var(--muted)', lineHeight: 1.5 },
+  codCheck: { marginLeft: 'auto', background: '#22C55E', color: 'white', borderRadius: '50%', width: '28px', height: '28px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, flexShrink: 0 },
+  codInfo: { display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '1.5rem', padding: '1rem', background: 'var(--cream)', borderRadius: '10px' },
+  codInfoItem: { fontSize: '13px', color: 'var(--muted)' },
   pageTitle: { fontFamily: 'var(--serif)', fontSize: '2rem', fontWeight: 700, marginBottom: '2rem' },
   steps: { display: 'flex', alignItems: 'center', marginBottom: '2.5rem' },
   stepItem: { display: 'flex', alignItems: 'center', gap: '8px', flex: 1 },
