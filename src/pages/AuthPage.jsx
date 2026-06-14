@@ -1,14 +1,19 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate, useSearchParams, Link } from 'react-router-dom'
 import { useAuth } from '@/context/AuthContext'
 
 export default function AuthPage() {
   const [mode, setMode] = useState('login')
   const [form, setForm] = useState({ name: '', email: '', password: '' })
-  const { login, register, error, loading, setError } = useAuth()
+  const { login, register, error, loading, setError, user } = useAuth()
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const next = searchParams.get('next') || '/'
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (user) navigate(next, { replace: true })
+  }, [user, navigate, next])
 
   const update = (field) => (e) => {
     setError('')
