@@ -1,8 +1,8 @@
-import AdminPage from '@/pages/AdminPage'
 import { Routes, Route } from 'react-router-dom'
 import { AuthProvider } from '@/context/AuthContext'
 import { CartProvider } from '@/context/CartContext'
 import Navbar from '@/components/layout/Navbar'
+import Footer from '@/components/layout/Footer'
 import CartDrawer from '@/components/cart/CartDrawer'
 import HomePage from '@/pages/HomePage'
 import ShopPage from '@/pages/ShopPage'
@@ -12,26 +12,30 @@ import ProductPage from '@/pages/ProductPage'
 import AuthPage from '@/pages/AuthPage'
 import CheckoutPage from '@/pages/CheckoutPage'
 import OrdersPage from '@/pages/OrdersPage'
+import AdminPage from '@/pages/AdminPage'
 
 export default function App() {
   return (
     <AuthProvider>
       <CartProvider>
-        <Navbar />
-        <CartDrawer />
-        <main>
-          <Routes>
-            <Route path="/admin" element={<AdminPage />} />
-            <Route path="/" element={<HomePage />} />
-            <Route path="/shop" element={<ShopPage />} />
-            <Route path="/collections" element={<CollectionsPage />} />
-            <Route path="/about" element={<AboutPage />} />
-            <Route path="/product/:id" element={<ProductPage />} />
-            <Route path="/login" element={<AuthPage />} />
-            <Route path="/checkout" element={<CheckoutPage />} />
-            <Route path="/orders" element={<OrdersPage />} />
-          </Routes>
-        </main>
+        <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+          <Navbar />
+          <CartDrawer />
+          <main style={{ flex: 1 }}>
+            <Routes>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/shop" element={<ShopPage />} />
+              <Route path="/collections" element={<CollectionsPage />} />
+              <Route path="/about" element={<AboutPage />} />
+              <Route path="/product/:id" element={<ProductPage />} />
+              <Route path="/login" element={<AuthPage />} />
+              <Route path="/checkout" element={<CheckoutPage />} />
+              <Route path="/orders" element={<OrdersPage />} />
+              <Route path="/admin" element={<AdminPage />} />
+            </Routes>
+          </main>
+          <Footer />
+        </div>
       </CartProvider>
     </AuthProvider>
   )
