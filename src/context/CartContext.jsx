@@ -1,10 +1,24 @@
-import { createContext, useContext, useState } from 'react'
+import { createContext, useContext, useState, useEffect } from 'react'
 
 const CartContext = createContext(null)
 
+const CART_KEY = 'maison_cart'
+
 export function CartProvider({ children }) {
-  const [items, setItems] = useState([])
+  const [items, setItems] = useState(() => {
+    try {
+      const saved = localStorage.getItem(CART_KEY)
+      return saved ? JSON.parse(saved) : []
+    } catch {
+      return []
+    }
+  })
   const [isOpen, setIsOpen] = useState(false)
+
+  // Save to localStorage whenever items change
+  useEffect(() => {
+    localStorage.setItem(CART_KEY, JSON.stringify(items))
+  }, [items])
 
   const addItem = (product, qty = 1) => {
     setItems(prev => {
@@ -21,7 +35,10 @@ export function CartProvider({ children }) {
     setItems(prev => prev.map(i => i.id === id ? { ...i, qty } : i))
   }
 
-  const clearCart = () => setItems([])
+  const clearCart = () => {
+    setItems([])
+    localStorage.removeItem(CART_KEY)
+  }
 
   const totalItems = items.reduce((s, i) => s + i.qty, 0)
   const totalPrice = items.reduce((s, i) => s + i.price * i.qty, 0)
