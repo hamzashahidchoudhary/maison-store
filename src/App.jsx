@@ -15,6 +15,8 @@ import CheckoutPage from '@/pages/CheckoutPage'
 import OrdersPage from '@/pages/OrdersPage'
 import AdminPage from '@/pages/AdminPage'
 
+import NotFoundPage from '@/pages/NotFoundPage'
+
 export default function App() {
   return (
     <AuthProvider>
@@ -34,6 +36,7 @@ export default function App() {
               <Route path="/checkout" element={<CheckoutPage />} />
               <Route path="/orders" element={<OrdersPage />} />
               <Route path="/admin" element={<AdminPage />} />
+              <Route path="*" element={<NotFoundPage />} />
             </Routes>
           </main>
           <Footer />
