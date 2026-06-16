@@ -46,8 +46,11 @@ export default function CartDrawer() {
             <div style={styles.items}>
               {items.map(item => (
                 <div key={item.id} style={styles.item}>
-                  <div style={{ ...styles.itemIcon, background: item.bg }}>
-                    {item.emoji}
+                  <div style={{ ...styles.itemIcon, background: item.bg, overflow: 'hidden' }}>
+                    {item.image
+                      ? <img src={item.image} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '8px' }} />
+                      : item.emoji
+                    }
                   </div>
                   <div style={styles.itemInfo}>
                     <div style={styles.itemName}>{item.name}</div>

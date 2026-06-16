@@ -176,7 +176,12 @@ export default function CheckoutPage() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '1rem' }}>
               {items.map(item => (
                 <div key={item.id} style={styles.summaryItem}>
-                  <div style={{ ...styles.summaryIcon, background: item.bg }}>{item.emoji}</div>
+                  <div style={{ ...styles.summaryIcon, background: item.bg, overflow: 'hidden' }}>
+                    {item.image
+                      ? <img src={item.image} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      : item.emoji
+                    }
+                  </div>
                   <div style={{ flex: 1 }}>
                     <div style={{ fontSize: '13px', fontWeight: 500 }}>{item.name}</div>
                     <div style={{ fontSize: '12px', color: 'var(--muted)' }}>Qty: {item.qty}</div>
