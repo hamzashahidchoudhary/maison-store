@@ -157,7 +157,12 @@ export default function AdminPage() {
           <h1 style={styles.pageTitle}>Admin Panel</h1>
           <p style={{ color: 'var(--muted)', fontSize: '14px' }}>{products.length} products in store</p>
         </div>
-        <button style={styles.newBtn} onClick={handleNew}>+ Add New Product</button>
+        <div style={{ display: 'flex', gap: '10px' }}>
+          <Link to="/admin/orders" style={{ ...styles.newBtn, background: 'transparent', color: 'var(--dark)', border: '1px solid var(--border)', textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
+            📦 View Orders
+          </Link>
+          <button style={styles.newBtn} onClick={handleNew}>+ Add New Product</button>
+        </div>
       </div>
 
       {successMsg && <div style={styles.successBanner}>{successMsg}</div>}
