@@ -16,6 +16,7 @@ import OrdersPage from '@/pages/OrdersPage'
 import AdminPage from '@/pages/AdminPage'
 
 import NotFoundPage from '@/pages/NotFoundPage'
+import SearchPage from '@/pages/SearchPage'
 
 export default function App() {
   return (
@@ -36,6 +37,7 @@ export default function App() {
               <Route path="/checkout" element={<CheckoutPage />} />
               <Route path="/orders" element={<OrdersPage />} />
               <Route path="/admin" element={<AdminPage />} />
+              <Route path="/search" element={<SearchPage />} />
               <Route path="*" element={<NotFoundPage />} />
             </Routes>
           </main>

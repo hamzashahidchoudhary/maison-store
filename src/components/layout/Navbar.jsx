@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useCart } from '@/context/CartContext'
 import { useAuth } from '@/context/AuthContext'
 
@@ -7,10 +7,22 @@ export default function Navbar() {
   const { totalItems, setIsOpen } = useCart()
   const { user, logout } = useAuth()
   const location = useLocation()
+  const navigate = useNavigate()
   const [menuOpen, setMenuOpen] = useState(false)
+  const [searchOpen, setSearchOpen] = useState(false)
+  const [searchVal, setSearchVal] = useState('')
 
   const isActive = (path) => location.pathname === path
   const closeMenu = () => setMenuOpen(false)
+
+  const handleSearch = (e) => {
+    e.preventDefault()
+    if (searchVal.trim()) {
+      navigate(`/search?q=${encodeURIComponent(searchVal.trim())}`)
+      setSearchOpen(false)
+      setSearchVal('')
+    }
+  }
 
   return (
     <>
@@ -171,6 +183,26 @@ export default function Navbar() {
               <Link to="/login" className="nav-link">Sign in</Link>
             )}
           </div>
+
+          {/* Search */}
+          {searchOpen ? (
+            <form onSubmit={handleSearch} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <input
+                autoFocus
+                value={searchVal}
+                onChange={e => setSearchVal(e.target.value)}
+                placeholder="Search..."
+                style={{ padding: '7px 14px', borderRadius: 'var(--radius-full)', border: '1px solid var(--border)', background: 'white', fontSize: '13px', fontFamily: 'var(--sans)', outline: 'none', width: '180px' }}
+              />
+              <button type="button" onClick={() => setSearchOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '16px', color: 'var(--muted)' }}>✕</button>
+            </form>
+          ) : (
+            <button onClick={() => setSearchOpen(true)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '6px', display: 'flex', alignItems: 'center', color: 'var(--muted)' }}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+              </svg>
+            </button>
+          )}
 
           <button className="nav-cart-btn" onClick={() => setIsOpen(true)}>
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
