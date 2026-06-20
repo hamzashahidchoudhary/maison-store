@@ -58,6 +58,18 @@ export const ordersAPI = {
   getOne: (id) => request(`/orders/${id}`),
 }
 
+// ─── Reviews ──────────────────────────────────────────
+export const reviewsAPI = {
+  getAll: (productId) => request(`/products/${productId}/reviews`),
+  create: (productId, body) => request(`/products/${productId}/reviews`, {
+    method: 'POST',
+    body: JSON.stringify(body),
+  }),
+  delete: (productId, reviewId) => request(`/products/${productId}/reviews/${reviewId}`, {
+    method: 'DELETE',
+  }),
+}
+
 // ─── Payments ─────────────────────────────────────────
 export const paymentsAPI = {
   createIntent: (amount) => request('/payments/create-intent', {

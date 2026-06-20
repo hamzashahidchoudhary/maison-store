@@ -2,6 +2,7 @@ import { useParams, Link } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import { productsAPI } from '@/lib/api'
 import { useCart } from '@/context/CartContext'
+import ReviewsSection from '@/components/product/ReviewsSection'
 
 export default function ProductPage() {
   const { id } = useParams()
@@ -11,11 +12,15 @@ export default function ProductPage() {
   const [qty, setQty] = useState(1)
   const [added, setAdded] = useState(false)
 
-  useEffect(() => {
+  const loadProduct = () => {
     productsAPI.getOne(id)
       .then(setProduct)
       .catch(console.error)
       .finally(() => setLoading(false))
+  }
+
+  useEffect(() => {
+    loadProduct()
   }, [id])
 
   const handleAdd = () => {
@@ -127,6 +132,8 @@ export default function ProductPage() {
           </div>
         </div>
       </div>
+
+      <ReviewsSection productId={product.id} onReviewChange={loadProduct} />
     </div>
   )
 }
